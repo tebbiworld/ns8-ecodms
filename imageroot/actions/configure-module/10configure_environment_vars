@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Store the Traefik transport settings and the interface language.
+
+import sys
+import json
+
+import agent
+
+data = json.load(sys.stdin)
+
+agent.set_env("TRAEFIK_HOST", data.get("host"))
+agent.set_env("TRAEFIK_HTTP2HTTPS", data.get("http2https", True))
+
+lang = data.get("language", "de_DE.UTF-8")
+if lang not in ("de_DE.UTF-8", "en_US.UTF-8"):
+    lang = "de_DE.UTF-8"
+agent.set_env("ECODMS_LANG", lang)
+
+agent.dump_env()

@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Return the current configuration and the connection details for the UI: the
+# Traefik transport settings plus the ecoDMS Connection Manager coordinates
+# (host name and server port) that the desktop client software needs.
+
+import os
+import sys
+import json
+
+import agent
+
+host = os.getenv("TRAEFIK_HOST", "")
+
+config = {
+    "host": host,
+    "http2https": os.getenv("TRAEFIK_HTTP2HTTPS") == "True",
+    "lets_encrypt": agent.get_route(os.environ["MODULE_ID"]).get("lets_encrypt", False),
+    "language": os.getenv("ECODMS_LANG", "de_DE.UTF-8"),
+    # Web interface (through Traefik)
+    "web_url": f"https://{host}/" if host else "",
+    # Desktop Connection Manager (direct ecoDMS protocol on the node)
+    "connection_host": host,
+    "connection_port": os.getenv("ECODMS_SRV_PORT_1", "17001"),
+}
+
+json.dump(config, fp=sys.stdout)

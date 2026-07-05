@@ -1,0 +1,51 @@
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# ecoDMS all-in-one server container. All ecoDMS services run inside this single
+# container; the data lives on mounted volumes.
+#
+# Storage (isolated rootless named volumes, never host paths):
+#   /srv/data      - the ecoDMS archive/data (permissions must not be changed)
+#   /srv/backup    - backups (kept separate from data)
+#   /srv/restore   - restores (kept separate from data)
+#   /srv/scaninput - drop folder for scanned documents; ecoDMS picks them up.
+#                    An optional Samba side share can expose this volume to users.
+
+[Unit]
+Description=ecoDMS server
+BindsTo=ecodms.service
+After=ecodms.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStartSec=300
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/ecodms-app.pid %t/ecodms-app.ctr-id
+ExecStart=/usr/bin/podman run \
+    --conmon-pidfile %t/ecodms-app.pid \
+    --cidfile %t/ecodms-app.ctr-id \
+    --cgroups=no-conmon \
+    --pod-id-file %t/ecodms.pod-id \
+    --replace -d --name ecodms-app \
+    --env LANG=${ECODMS_LANG} \
+    --env LANGUAGE=${ECODMS_LANG} \
+    --env LC_ALL=${ECODMS_LANG} \
+    --volume ecodms-data:/srv/data:z \
+    --volume ecodms-backup:/srv/backup:z \
+    --volume ecodms-restore:/srv/restore:z \
+    --volume ecodms-scaninput:/srv/scaninput:z \
+    ${ECODMS_IMAGE}
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/ecodms-app.ctr-id -t 30
+ExecReload=/usr/bin/podman kill -s HUP ecodms-app
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/ecodms-app.ctr-id
+PIDFile=%t/ecodms-app.pid
+Type=forking
+SyslogIdentifier=%u
+
+[Install]
+WantedBy=default.target

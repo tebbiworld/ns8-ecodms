@@ -1,0 +1,45 @@
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Rootless pod for the ecoDMS module.
+#
+# Port model (no dedicated IP required for ecoDMS):
+#   - Web client (container 8080) and REST API (container 8180) are published on
+#     the node loopback and fronted by Traefik on the configured host name.
+#   - The ecoDMS server ports 17001-17004 (Connection Manager and database, used
+#     by the ecoDMS desktop client software) speak ecoDMS' own non-HTTP protocol
+#     and are published directly on the node. Traefik only handles HTTP, so these
+#     can not go through it. They are fixed ports, hence a single ecoDMS instance
+#     per node.
+
+[Unit]
+Description=ecoDMS pod
+Requires=ecodms-app.service
+Before=ecodms-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/ecodms.pid %t/ecodms.pod-id
+ExecStartPre=/usr/bin/podman pod create \
+    --infra-conmon-pidfile %t/ecodms.pid \
+    --pod-id-file %t/ecodms.pod-id \
+    --name ecodms \
+    --publish 127.0.0.1:${WEB_PORT}:8080 \
+    --publish ${ECODMS_SRV_PORT_1}:17001 \
+    --publish ${ECODMS_SRV_PORT_2}:17002 \
+    --publish ${ECODMS_SRV_PORT_3}:17003 \
+    --publish ${ECODMS_SRV_PORT_4}:17004 \
+    --replace
+ExecStart=/usr/bin/podman pod start --pod-id-file %t/ecodms.pod-id
+ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/ecodms.pod-id -t 30
+ExecStopPost=/usr/bin/podman pod rm --ignore -f --pod-id-file %t/ecodms.pod-id
+PIDFile=%t/ecodms.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

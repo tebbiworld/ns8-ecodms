@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Seed the initial environment for a fresh ecoDMS instance.
+
+import os
+
+import agent
+
+# One allocated port fronts the ecoDMS web interface (container 8080) through
+# Traefik.
+tcp_ports = [p.strip() for p in os.environ.get("TCP_PORTS", "").split(",") if p.strip()]
+web_port = tcp_ports[0] if tcp_ports else "8080"
+agent.set_env("WEB_PORT", web_port)
+
+# The ecoDMS server ports for the desktop Connection Manager and the database.
+# They speak ecoDMS' own protocol (not HTTP) and are published directly on the
+# node; fixed values, so a single instance per node.
+agent.set_env("ECODMS_SRV_PORT_1", "17001")
+agent.set_env("ECODMS_SRV_PORT_2", "17002")
+agent.set_env("ECODMS_SRV_PORT_3", "17003")
+agent.set_env("ECODMS_SRV_PORT_4", "17004")
+
+# Interface language of the ecoDMS server (de_DE.UTF-8 or en_US.UTF-8).
+agent.set_env("ECODMS_LANG", "de_DE.UTF-8")
+
+agent.dump_env()

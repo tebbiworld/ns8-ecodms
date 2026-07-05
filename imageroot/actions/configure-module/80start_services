@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Enable and (re)start the ecoDMS pod. Restarting the pod unit cascades to the
+# app container through the unit dependencies.
+
+import subprocess
+
+units = ["ecodms.service", "ecodms-app.service"]
+subprocess.run(["systemctl", "--user", "enable", *units], check=True)
+subprocess.run(["systemctl", "--user", "restart", "ecodms.service"], check=True)

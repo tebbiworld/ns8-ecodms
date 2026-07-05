@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Configure ecodms",
+    "$id": "http://nethserver.org/json-schema/task/input/ecodms/configure-module",
+    "description": "Configure the ecoDMS module",
+    "examples": [
+        {
+            "host": "ecodms.example.org",
+            "http2https": true,
+            "lets_encrypt": true,
+            "language": "de_DE.UTF-8"
+        }
+    ],
+    "type": "object",
+    "required": ["host"],
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "Fully qualified domain name for the ecoDMS web client",
+            "format": "hostname",
+            "pattern": "\\."
+        },
+        "lets_encrypt": {
+            "type": "boolean",
+            "title": "Let's Encrypt certificate",
+            "description": "Request a valid Let's Encrypt certificate for the host name."
+        },
+        "http2https": {
+            "type": "boolean",
+            "title": "HTTP to HTTPS redirection",
+            "description": "Redirect all HTTP requests to HTTPS."
+        },
+        "language": {
+            "type": "string",
+            "title": "Interface language",
+            "enum": ["de_DE.UTF-8", "en_US.UTF-8"],
+            "description": "Language of the ecoDMS server."
+        }
+    }
+}
