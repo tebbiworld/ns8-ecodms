@@ -85,7 +85,7 @@ Private hobby project, shared as-is. No warranty, no guaranteed support, use at 
 
 ----
 {{tag>application}}
-{{tag>category:office}}
+{{tag>category:Productivity}}
 {{tag>status:Alpha}}
 {{tag>certlevel:1}}
 {{tag>repo:tebbiworld}}
