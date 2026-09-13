@@ -1,0 +1,92 @@
+======ecoDMS======
+[[https://www.ecodms.de|ecoDMS]] is a document archive and management system (DMS): scan, import, classify and full-text search documents, with revision-safe archiving. It is commercial software from ecoDMS GmbH (Germany); the server is free for private use and licensed per user for companies.
+
+====Announcement and talks====
+The ecoDMS app announcement TBA
+
+ecoDMS is a community application from the [[ns8:tebbiworld_repository|tebbiworld]] repository. Documentation and source can be found on [[https://github.com/tebbiworld/ns8-ecodms|Github]]
+
+=====What it does=====
+The module packages the official ''ecodms/ecodms'' server image (ecoDMS 26.01 "burns") for NethServer 8: web client and %%REST%% %%API%% behind Traefik with TLS, the ecoDMS server ports for the desktop client and the Connection Manager published on the node, and the archive on isolated named volumes that are part of the NS8 backup.
+
+  * **Web client** and **%%REST%% %%API%%** on one host name with Let's Encrypt
+  * **Desktop client / Connection Manager** connect to the node on the standard ecoDMS ports 17001–17004 — no dedicated IP address required
+  * **Scan input folder** as a volume: documents dropped there are imported automatically
+  * Interface language German or English
+
+The module ships no ecoDMS software; the node pulls the official image at install time. Licensing (free private use, per-user business licences) is handled inside ecoDMS as documented by the vendor.
+
+=====Architecture=====
+A single rootless container from the pinned official image.
+
+^ Service ^ Container port ^ Exposed as ^
+| Web client | 8080 | Traefik HTTPS route ''%%https://<fqdn>/%%'' |
+| %%REST%% %%API%% | 8180 | Traefik route ''%%https://<fqdn>/api%%'' |
+| ecoDMS server / Connection Manager | 17001 | published on the node ''%%<fqdn>:17001%%'' |
+| Database | 17002 | published on the node |
+| ecoDMS services | 17003, 17004 | published on the node |
+
+Traefik only routes HTTP, therefore the ecoDMS protocol ports are published directly on the node address. Because these ports are fixed, **only one instance per node** is possible.
+
+^ Volume ^ Mount ^ Purpose ^
+| ''ecodms-data'' | ''/srv/data'' | the archive (do not change permissions) |
+| ''ecodms-backup'' | ''/srv/backup'' | ecoDMS' own backups, kept apart from the data |
+| ''ecodms-restore'' | ''/srv/restore'' | restore staging |
+| ''ecodms-scaninput'' | ''/srv/scaninput'' | drop folder, imported automatically |
+
+=====Installation=====
+On the NethServer 8 cluster leader:
+
+<code bash>
+add-module ghcr.io/tebbiworld/ecodms:1.0.0 1
+</code>
+
+Configure it, replacing the host name:
+
+<code bash>
+api-cli run module/ecodms1/configure-module --data '{
+  "host": "ecodms.example.org",
+  "lets_encrypt": true,
+  "http2https": true,
+  "language": "de_DE.UTF-8"
+}'
+</code>
+
+Then open ''%%https://ecodms.example.org/%%'' for the web client, or point the ecoDMS desktop client / Connection Manager at server ''ecodms.example.org'', port ''17001''. Initial credentials and the first-run steps are those of the official image (see the ecoDMS manual).
+
+=====Settings=====
+
+^ Setting ^ Description ^
+| Host name | %%FQDN%% of the web client and the %%API%%; also the server name for the desktop client. |
+| Let's Encrypt certificate | Requests a certificate for the host name. Requires that ports 80 and 443 of this name reach this node. |
+| HTTP to HTTPS redirection | Redirects HTTP to HTTPS. |
+| Interface language | ''de_DE.UTF-8'' or ''en_US.UTF-8'' — the language of the ecoDMS server. |
+
+====Scan input folder====
+Documents placed into the ''ecodms-scaninput'' volume are imported by ecoDMS automatically (manual chapters 4.2.1 / 4.2.6). The module does not expose that folder as a network share yet: on a node that also runs the NS8 file server, port 445 is taken. Either copy documents into the volume on the node (''runagent -m ecodms1 podman volume inspect ecodms-scaninput'') or feed ecoDMS through the desktop client. A Samba side share for the folder is planned.
+
+=====Backup=====
+The NS8 backup includes all four named volumes, so the archive, the scan input folder and ecoDMS' own backup/restore folders are covered. For the application-level backup and restore that ecoDMS offers, use ''/srv/backup'' and ''/srv/restore'' as described in the manual and keep them on separate storage from the data.
+
+=====Licences and trademarks=====
+Unofficial, community-built package, not affiliated with or endorsed by ecoDMS GmbH. "ecoDMS" is a trademark of ecoDMS GmbH and is used here only to identify the packaged software.
+
+The module pulls the official ''ecodms/ecodms'' image at runtime and does not redistribute it; ecoDMS is proprietary software subject to the vendor's licence terms. The module's own code is licensed %%GPL%%-3.0-or-later.
+
+=====Links=====
+
+  * [[https://www.ecodms.de/de/kaufberatung/downloads/handbuecher|ecoDMS manuals]] (German)
+  * [[https://hub.docker.com/r/ecodms/ecodms|Official Docker image]]
+  * [[https://github.com/tebbiworld/ns8-ecodms|Module on Github]]
+  * [[https://github.com/tebbiworld/ns8-ecodms/issues|Bug reports]]
+
+=====Disclaimer=====
+Private hobby project, shared as-is. No warranty, no guaranteed support, use at your own risk.
+
+----
+{{tag>application}}
+{{tag>category:office}}
+{{tag>status:Alpha}}
+{{tag>certlevel:1}}
+{{tag>repo:tebbiworld}}
+{{tag>description:"ecoDMS document archive and management system"}}
