@@ -62,9 +62,12 @@ ch. 4.2.1 / 4.2.6) instead of exposing a host path.
 
 ## Backups
 
-The NS8 backup covers the named volumes. For ecoDMS' own backup/restore feature
-use the `/srv/backup` and `/srv/restore` folders as described in the ecoDMS
-manual; keep them on separate storage from the data.
+Since 1.0.1 the NS8 backup includes the module state and all four named
+volumes (`imageroot/etc/state-include.conf`; 1.0.0 backed up the module
+environment only). The archive volume is copied while ecoDMS is running, so for
+a guaranteed consistent copy of the database run ecoDMS' own backup into
+`/srv/backup` first (ecoDMS manual) — that volume is part of the NS8 backup as
+well. Keep backup and restore folders on separate storage from the data.
 
 ## License
 

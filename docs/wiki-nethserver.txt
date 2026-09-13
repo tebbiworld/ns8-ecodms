@@ -38,7 +38,7 @@ Traefik only routes HTTP, therefore the ecoDMS protocol ports are published dire
 On the NethServer 8 cluster leader:
 
 <code bash>
-add-module ghcr.io/tebbiworld/ecodms:1.0.0 1
+add-module ghcr.io/tebbiworld/ecodms:1.0.1 1
 </code>
 
 Configure it, replacing the host name:
@@ -66,7 +66,7 @@ Then open ''%%https://ecodms.example.org/%%'' for the web client, or point the e
 Documents placed into the ''ecodms-scaninput'' volume are imported by ecoDMS automatically (manual chapters 4.2.1 / 4.2.6). The module does not expose that folder as a network share yet: on a node that also runs the NS8 file server, port 445 is taken. Either copy documents into the volume on the node (''runagent -m ecodms1 podman volume inspect ecodms-scaninput'') or feed ecoDMS through the desktop client. A Samba side share for the folder is planned.
 
 =====Backup=====
-The NS8 backup includes all four named volumes, so the archive, the scan input folder and ecoDMS' own backup/restore folders are covered. For the application-level backup and restore that ecoDMS offers, use ''/srv/backup'' and ''/srv/restore'' as described in the manual and keep them on separate storage from the data.
+Since module version 1.0.1 the NS8 backup includes the module state and all four named volumes: the archive, the scan input folder and ecoDMS' own backup/restore folders (1.0.0 backed up the module environment only). The archive volume is copied while ecoDMS is running; for a guaranteed consistent copy of the database run ecoDMS' own backup into ''/srv/backup'' first, as described in the manual — that volume is part of the NS8 backup as well. Keep backup and restore folders on separate storage from the data.
 
 =====Licences and trademarks=====
 Unofficial, community-built package, not affiliated with or endorsed by ecoDMS GmbH. "ecoDMS" is a trademark of ecoDMS GmbH and is used here only to identify the packaged software.
