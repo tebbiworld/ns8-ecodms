@@ -24,4 +24,8 @@ lang = data.get("language", "de_DE.UTF-8")
 if lang not in ("de_DE.UTF-8", "en_US.UTF-8"):
     lang = "de_DE.UTF-8"
 agent.set_env("ECODMS_LANG", lang)
+# The image only ships the de_DE.UTF-8 locale. Its start script switches the
+# interface to English when LANG is "eng"; LC_ALL stays on the image default,
+# so initdb keeps working.
+agent.set_env("ECODMS_RUN_LANG", "eng" if lang.startswith("en") else "de_DE.UTF-8")
 

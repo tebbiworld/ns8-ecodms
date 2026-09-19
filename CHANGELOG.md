@@ -10,6 +10,10 @@ Alignment with the NethServer module conventions (NethServer/agents skills).
 - Service restarts list both units of the pod explicitly; `update-module` only restarts a running instance.
 - Removed calls to the deprecated `agent.dump_env()`.
 
+### Fixed
+
+- **English interface.** The language was handed to the container as `LANG`, `LANGUAGE` and `LC_ALL=en_US.UTF-8`, a locale the ecoDMS image does not ship: English never took effect, and a fresh install set to English could not initialise its database (the service kept restarting, the web client answered 502). The container now gets `LANG=eng`, the value the upstream start script expects. Found by the new install test. Existing instances are converted by an `update-module.d` hook.
+
 ### Added
 
 - Robot Framework tests (install, update from the previous release, backup and restore) run on real NS8 nodes through `stephdl/ns8-ci-actions`.
