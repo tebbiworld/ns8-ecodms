@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Copy the settings of the original instance. The documents, the ecoDMS
+# database and its own backups come back with the restored volumes.
+
+import json
+import sys
+
+import agent
+
+request = json.load(sys.stdin)
+env = request["environment"]
+
+KEEP = ["TRAEFIK_HOST", "TRAEFIK_HTTP2HTTPS", "TRAEFIK_LETS_ENCRYPT", "ECODMS_LANG"]
+
+agent.mset_env({k: env[k] for k in KEEP if k in env})
