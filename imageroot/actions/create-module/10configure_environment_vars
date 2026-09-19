@@ -28,4 +28,3 @@ agent.set_env("ECODMS_SRV_PORT_4", "17004")
 # Interface language of the ecoDMS server (de_DE.UTF-8 or en_US.UTF-8).
 agent.set_env("ECODMS_LANG", "de_DE.UTF-8")
 
-agent.dump_env()

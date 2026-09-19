@@ -16,10 +16,12 @@ data = json.load(sys.stdin)
 
 agent.set_env("TRAEFIK_HOST", data.get("host"))
 agent.set_env("TRAEFIK_HTTP2HTTPS", data.get("http2https", True))
+if "lets_encrypt" in data:
+    # kept so restore-module can re-create the route with the same setting
+    agent.set_env("TRAEFIK_LETS_ENCRYPT", data["lets_encrypt"])
 
 lang = data.get("language", "de_DE.UTF-8")
 if lang not in ("de_DE.UTF-8", "en_US.UTF-8"):
     lang = "de_DE.UTF-8"
 agent.set_env("ECODMS_LANG", lang)
 
-agent.dump_env()
