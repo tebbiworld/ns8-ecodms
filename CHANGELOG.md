@@ -22,7 +22,7 @@ Secrets: nothing to move, this module stores no password in its environment.
 
 ### Platform integration
 
-- **Clone and move.** New `clone-module` step (a link to the restore step): a cloned or moved instance gets its route and settings back instead of coming up unconfigured.
+- **Clone and move.** New `clone-module` step (a link to the restore step): a cloned or moved instance gets its route and settings back instead of coming up unconfigured. The settings are read from the source instance, including those a new instance starts with a default for.
 - `org.nethserver.max-per-node=1`: the module owns fixed ports on the node, a second instance on the same node is refused at install time instead of failing at start.
 - `org.nethserver.volumes`: the bulk-data volume(s) `ecodms-data ecodms-backup` can be placed on an additional disk when the module is installed.
 - Release notes are linked from the software centre (`relnotes_url`).
