@@ -4,14 +4,20 @@
     "en": "ecoDMS document archive and management system",
     "de": "ecoDMS Dokumentenarchiv- und Verwaltungssystem"
   },
-  "categories": ["office"],
+  "categories": [
+    "office"
+  ],
   "authors": [
-    { "name": "tebbi", "email": "info@ebbinghaus.world" }
+    {
+      "name": "tebbi",
+      "email": "info@ebbinghaus.world"
+    }
   ],
   "docs": {
     "documentation_url": "https://www.ecodms.de/de/kaufberatung/downloads/handbuecher",
     "bug_url": "https://github.com/tebbiworld/ns8-ecodms/issues",
-    "code_url": "https://github.com/tebbiworld/ns8-ecodms"
+    "code_url": "https://github.com/tebbiworld/ns8-ecodms",
+    "relnotes_url": "https://github.com/tebbiworld/ns8-ecodms/releases"
   },
   "source": "ghcr.io/tebbiworld/ecodms"
 }
