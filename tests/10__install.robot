@@ -50,5 +50,12 @@ Both units are active
 
 *** Keywords ***
 Web client is served
-    ${code} =    Run on node    curl -sSkL -o /dev/null -w '\%{http_code}' -H 'Host: ecodms.ci.test' https://127.0.0.1/
-    Should Be Equal As Strings    ${code.strip()}    200
+    # A fresh ecoDMS has no web client yet (it is enabled from the ecoDMS settings once the
+    # archive is licensed), so its Jetty answers 404 on "/". What the module has to deliver is
+    # the path Traefik -> pod -> Jetty: accept any answer of the backend, reject Traefik's own
+    # 404 ("404 page not found", no route) and 502/503 (backend down).
+    ${out} =    Run on node    curl -sSkL -w '\nHTTP_CODE=\%{http_code}' -H 'Host: ecodms.ci.test' https://127.0.0.1/
+    Should Match Regexp    ${out}    HTTP_CODE=(200|401|403|404)
+    Should Not Contain    ${out}    404 page not found
+    ${port} =    Run on node    runagent -m ${module_id} podman exec ecodms-app bash -c 'ss -ltn | grep -q ":17001 " && echo listening'
+    Should Be Equal As Strings    ${port.strip()}    listening
