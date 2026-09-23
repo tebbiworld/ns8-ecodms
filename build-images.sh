@@ -36,11 +36,15 @@ buildah add "${container}" ui/dist /ui
 # Traefik. The ecoDMS server ports 17001-17004 (Connection Manager / DB) are
 # fixed and published directly on the node, as they use ecoDMS' own non-HTTP
 # transport that Traefik can not route.
+# One instance per node: the ecoDMS client ports 17001-17004 are published on the node.
+# The bulk-data volumes can be placed on an additional disk at install time.
 buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
     --label="org.nethserver.images=${ecodms_image}" \
+    --label="org.nethserver.max-per-node=1" \
+    --label="org.nethserver.volumes=ecodms-data ecodms-backup" \
     "${container}"
 buildah commit "${container}" "${repobase}/${reponame}"
 
