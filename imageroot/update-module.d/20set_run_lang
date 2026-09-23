@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+
+#
+# Copyright (C) 2026 tebbi
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Releases up to 1.0.1 passed the UI language as LANG, LANGUAGE and LC_ALL.
+# The image has no en_US.UTF-8 locale, so English never took effect and a
+# fresh install with English could not initialise its database.
+# Derive the value the container understands from the stored setting.
+
+import os
+import agent
+
+lang = os.environ.get("ECODMS_LANG", "de_DE.UTF-8")
+agent.set_env("ECODMS_RUN_LANG", "eng" if lang.startswith("en") else "de_DE.UTF-8")

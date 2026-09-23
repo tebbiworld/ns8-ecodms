@@ -16,10 +16,16 @@ data = json.load(sys.stdin)
 
 agent.set_env("TRAEFIK_HOST", data.get("host"))
 agent.set_env("TRAEFIK_HTTP2HTTPS", data.get("http2https", True))
+if "lets_encrypt" in data:
+    # kept so restore-module can re-create the route with the same setting
+    agent.set_env("TRAEFIK_LETS_ENCRYPT", data["lets_encrypt"])
 
 lang = data.get("language", "de_DE.UTF-8")
 if lang not in ("de_DE.UTF-8", "en_US.UTF-8"):
     lang = "de_DE.UTF-8"
 agent.set_env("ECODMS_LANG", lang)
+# The image only ships the de_DE.UTF-8 locale. Its start script switches the
+# interface to English when LANG is "eng"; LC_ALL stays on the image default,
+# so initdb keeps working.
+agent.set_env("ECODMS_RUN_LANG", "eng" if lang.startswith("en") else "de_DE.UTF-8")
 
-agent.dump_env()

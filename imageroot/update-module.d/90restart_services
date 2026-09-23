@@ -13,4 +13,4 @@ set -e
 exec 1>&2
 
 systemctl --user daemon-reload
-systemctl --user restart ecodms.service
+systemctl --user try-restart ecodms.service ecodms-app.service
