@@ -14,7 +14,7 @@ reponame="ecodms"
 # Pin the ecoDMS all-in-one server image (ecoDMS 26.01 "burns"). Declared in the
 # org.nethserver.images label so the node pre-pulls it and exposes it to the
 # systemd unit as ${ECODMS_IMAGE}.
-ecodms_image="docker.io/ecodms/ecodms:26.01-02"
+ecodms_image="docker.io/ecodms/ecodms:26.01-03"
 
 container=$(buildah from scratch)
 
